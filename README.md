@@ -81,6 +81,8 @@ When the database is empty, the API also creates ten starter jobs across email, 
 
 ## API
 
+`GET /api` is a health endpoint. It returns HTTP `200 OK` with the API status and timestamp; use `/api` as the Render health-check path.
+
 `POST /api/jobs` accepts `{ "title", "type", "payload?" }`; types are `email`, `report`, `data-processing`, and `notification`. New jobs always begin `pending`.
 
 `GET /api/jobs?page=1&limit=6&status=&type=&search=` returns `{ data, meta }`. `GET /api/jobs/:id` reads a job; `GET /api/jobs/counts` returns status totals. `PATCH /api/jobs/:id/status` accepts `{ "status" }`; valid transitions are pending → running/failed and running → completed. `DELETE /api/jobs/:id` removes it.
