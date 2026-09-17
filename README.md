@@ -55,6 +55,26 @@ npm run dev
 
 Open `http://localhost:5173`; API is at `http://localhost:3000/api`. Optional environment variables: `PORT`, `FRONTEND_ORIGIN`, `DATABASE_PATH`, and frontend `VITE_API_URL`.
 
+### Environment setup
+
+Environment files are intentionally not committed. Create local files from the provided templates:
+
+```bash
+copy backend\.env.example backend\.env
+copy frontend\.env.example frontend\.env
+```
+
+For local development, the defaults work without changes. For deployment, the backend and frontend must be told where the other application lives:
+
+| Application | Variable | Example production value | Purpose |
+| --- | --- | --- | --- |
+| Frontend | `VITE_API_URL` | `https://api.example.com/api` | The URL the browser uses for every API request. Vite embeds this value during the frontend build. |
+| Backend | `FRONTEND_ORIGIN` | `https://jobs.example.com` | The allowed browser origin for CORS. Do not add `/api` here. |
+| Backend | `PORT` | Platform-provided value | API listening port; most hosts provide this automatically. |
+| Backend | `DATABASE_PATH` | `/data/jobs.sqlite` | SQLite file location. Use a persistent volume path in production. |
+
+After changing `frontend/.env`, restart the Vite server locally or create a new production build; `VITE_*` variables are build-time values. Backend environment variables are read when the API starts. On a deployment platform, set these values in its environment-variable dashboard instead of uploading an `.env` file.
+
 SQLite is initialized automatically on the first backend start, with indexes for status, type, and creation time. The database is stored at `backend/data/jobs.sqlite`; that folder is created automatically and database files are excluded from Git. Copy `backend/.env.example` to `backend/.env` if you want to document local values, or set `DATABASE_PATH` in your shell to use another persistent location. Delete `backend/data/jobs.sqlite` only if you explicitly want a fresh local database.
 
 When the database is empty, the API also creates ten starter jobs across email, report, data-processing, and notification types. Existing jobs are never overwritten or duplicated.
@@ -69,4 +89,4 @@ Errors use `{ success:false, error:{ code, message } }`. Atomic `UPDATE ... WHER
 
 ## Tests and deployment
 
-Run backend tests with `npm test --prefix backend`. A practical deployment uses the frontend static build (`npm run build --prefix frontend`) and a Node service for `backend`, with a persistent volume for the SQLite database. Future work could add authentication, PostgreSQL, richer type payload validation, and frontend component tests.
+Run backend tests with `npm test --prefix backend`. Deploy the frontend as a static site using `npm run build --prefix frontend`, after setting `VITE_API_URL`. Deploy `backend` as a Node service using `npm start --prefix backend`, set `FRONTEND_ORIGIN`, and attach persistent storage for `DATABASE_PATH`. SQLite needs a persistent disk and is therefore not appropriate for stateless/serverless API hosting; use a host with a mounted volume, or migrate the adapter to PostgreSQL for that environment. Future work could add authentication, PostgreSQL, richer type payload validation, and frontend component tests.
