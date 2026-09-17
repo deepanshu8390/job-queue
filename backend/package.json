@@ -1,0 +1,9 @@
+{
+  "name": "job-dashboard-api",
+  "version": "1.0.0",
+  "scripts": { "start": "node src/main.js", "start:dev": "node --watch src/main.js", "test": "node --test test/*.test.js" },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1", "@nestjs/core": "^11.0.1", "@nestjs/platform-express": "^11.0.1",
+    "better-sqlite3": "^12.4.1", "class-transformer": "^0.5.1", "class-validator": "^0.14.1", "reflect-metadata": "^0.2.2", "rxjs": "^7.8.1"
+  }
+}

@@ -1,0 +1,6 @@
+const v = require('class-validator');
+const statuses=['pending','running','completed','failed']; const types=['email','report','data-processing','notification'];
+class CreateJobDto {} v.IsString()(CreateJobDto.prototype,'title');v.IsNotEmpty()(CreateJobDto.prototype,'title');v.IsIn(types)(CreateJobDto.prototype,'type');v.IsOptional()(CreateJobDto.prototype,'payload');v.IsObject()(CreateJobDto.prototype,'payload');
+class UpdateStatusDto {} v.IsIn(statuses)(UpdateStatusDto.prototype,'status');
+class QueryJobsDto { constructor(){this.page=1;this.limit=6;} } v.IsOptional()(QueryJobsDto.prototype,'status');v.IsIn(statuses)(QueryJobsDto.prototype,'status');v.IsOptional()(QueryJobsDto.prototype,'type');v.IsIn(types)(QueryJobsDto.prototype,'type');v.IsOptional()(QueryJobsDto.prototype,'search');v.IsString()(QueryJobsDto.prototype,'search');v.IsOptional()(QueryJobsDto.prototype,'page');v.IsInt()(QueryJobsDto.prototype,'page');v.Min(1)(QueryJobsDto.prototype,'page');v.IsOptional()(QueryJobsDto.prototype,'limit');v.IsInt()(QueryJobsDto.prototype,'limit');v.Min(1)(QueryJobsDto.prototype,'limit');v.Max(50)(QueryJobsDto.prototype,'limit');
+module.exports={CreateJobDto,UpdateStatusDto,QueryJobsDto};

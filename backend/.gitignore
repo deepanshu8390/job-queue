@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Local database files
+data/*.sqlite
+data/*.sqlite3
+data/*.db
+data/*-wal
+data/*-shm
+
+# Environment files and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# Test and build artifacts
+coverage/
+dist/

@@ -1,0 +1,1 @@
+const { Module }=require('@nestjs/common'); const { JobsController }=require('./jobs.controller'); const { JobsService }=require('./jobs.service'); class JobsModule{} Module({controllers:[JobsController],providers:[JobsService]})(JobsModule); module.exports={JobsModule};
