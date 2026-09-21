@@ -7,20 +7,35 @@ class JobsService {
   constructor() { this.repository = new JobRepository(); }
   onModuleInit() {
     const counts = this.repository.countByStatus();
-    if (Object.values(counts).some(Boolean)) return;
-    const demoJobs = [
-      ['Send welcome email', 'email', { email: 'maya@example.com' }],
-      ['Weekly revenue report', 'report', { period: 'week' }],
-      ['Import customer records', 'data-processing', { source: 'crm-export.csv' }],
-      ['Team standup reminder', 'notification', { channel: 'operations' }],
-      ['Password reset email', 'email', { email: 'sam@example.com' }],
-      ['Monthly performance report', 'report', { period: 'month' }],
-      ['Normalize product catalog', 'data-processing', { source: 'catalog-feed' }],
-      ['Maintenance window alert', 'notification', { channel: 'engineering' }],
-      ['Invoice delivery email', 'email', { email: 'billing@example.com' }],
-      ['Quarterly planning report', 'report', { period: 'quarter' }],
-    ];
-    demoJobs.forEach(([title, type, payload]) => this.create({ title, type, payload }));
+    if (!Object.values(counts).some(Boolean)) {
+      const demoJobs = [
+        ['Send welcome email', 'email', { email: 'maya@example.com' }],
+        ['Weekly revenue report', 'report', { period: 'week' }],
+        ['Import customer records', 'data-processing', { source: 'crm-export.csv' }],
+        ['Team standup reminder', 'notification', { channel: 'operations' }],
+        ['Password reset email', 'email', { email: 'sam@example.com' }],
+        ['Monthly performance report', 'report', { period: 'month' }],
+        ['Normalize product catalog', 'data-processing', { source: 'catalog-feed' }],
+        ['Maintenance window alert', 'notification', { channel: 'engineering' }],
+        ['Invoice delivery email', 'email', { email: 'billing@example.com' }],
+        ['Quarterly planning report', 'report', { period: 'quarter' }],
+      ];
+      demoJobs.forEach(([title, type, payload]) => this.create({ title, type, payload }));
+    }
+
+    const { rows } = this.repository.findPaginated({
+      page: 1,
+      limit: 1,
+      search: "Remember Chahat's birthday",
+    });
+
+    if (!rows.length) {
+      this.create({
+        title: "Remember Chahat's birthday — 13 November",
+        type: 'notification',
+        payload: { date: '13 November' },
+      });
+    }
   }
   create(input) { const title=input.title.trim(); if (!title) throw new BadRequestException({code:'VALIDATION_ERROR',message:'title must not be empty'}); const domain=createJob({ ...input,title }); if(!domain) throw new BadRequestException({code:'INVALID_JOB_TYPE',message:'Unsupported job type or invalid payload'}); return this.repository.create({ id:`job_${randomUUID()}`, title, type:input.type, status:'pending', payload:input.payload || null, createdAt:new Date().toISOString() }); }
   list(q) {
