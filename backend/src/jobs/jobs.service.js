@@ -23,18 +23,18 @@ class JobsService {
       demoJobs.forEach(([title, type, payload]) => this.create({ title, type, payload }));
     }
 
-    const { rows } = this.repository.findPaginated({
-      page: 1,
-      limit: 1,
-      search: "Remember Chahat's birthday",
-    });
-
+    const { rows } = this.repository.findPaginated({ page: 1, limit: 1, search: "Remember Chahat's birthday" });
     if (!rows.length) {
       this.create({
         title: "Remember Chahat's birthday — 13 November",
         type: 'notification',
         payload: { date: '13 November' },
       });
+    }
+
+    const topTwo = this.repository.findPaginated({ page: 1, limit: 2 });
+    if (topTwo.rows.length >= 2 && topTwo.rows[0].title === "Remember Chahat's birthday — 13 November") {
+      this.repository.updateTitle(topTwo.rows[1].id, 'Chahat har Ekadashi vrat rakhi Hain');
     }
   }
   create(input) { const title=input.title.trim(); if (!title) throw new BadRequestException({code:'VALIDATION_ERROR',message:'title must not be empty'}); const domain=createJob({ ...input,title }); if(!domain) throw new BadRequestException({code:'INVALID_JOB_TYPE',message:'Unsupported job type or invalid payload'}); return this.repository.create({ id:`job_${randomUUID()}`, title, type:input.type, status:'pending', payload:input.payload || null, createdAt:new Date().toISOString() }); }
