@@ -14,6 +14,7 @@ class SqliteJobAdapter {
   create(job) { this.db.prepare('INSERT INTO jobs (id,title,type,status,payload,createdAt) VALUES (@id,@title,@type,@status,@payload,@createdAt)').run({ ...job, payload: job.payload ? JSON.stringify(job.payload) : null }); return this.findById(job.id); }
   findById(id) { return this.row(this.db.prepare('SELECT * FROM jobs WHERE id=?').get(id)); }
   findPaginated({ page, limit, status, type, search }) { const clauses=[], params=[]; if(status){clauses.push('status=?');params.push(status)} if(type){clauses.push('type=?');params.push(type)} if(search){clauses.push('title LIKE ?');params.push(`%${search}%`)} const where=clauses.length?`WHERE ${clauses.join(' AND ')}`:''; const total=this.db.prepare(`SELECT COUNT(*) total FROM jobs ${where}`).get(...params).total; const rows=this.db.prepare(`SELECT * FROM jobs ${where} ORDER BY createdAt DESC LIMIT ? OFFSET ?`).all(...params,limit,(page-1)*limit).map(r=>this.row(r)); return { rows,total }; }
+  updateTitle(id, title) { return this.db.prepare('UPDATE jobs SET title=? WHERE id=?').run(title,id).changes; }
   updateStatus(id, oldStatus, newStatus) { return this.db.prepare('UPDATE jobs SET status=? WHERE id=? AND status=?').run(newStatus,id,oldStatus).changes; }
   delete(id) { return this.db.prepare('DELETE FROM jobs WHERE id=?').run(id).changes; }
   countByStatus() { const result={ pending:0,running:0,completed:0,failed:0 }; this.db.prepare('SELECT status, COUNT(*) count FROM jobs GROUP BY status').all().forEach(r=>result[r.status]=r.count); return result; }
